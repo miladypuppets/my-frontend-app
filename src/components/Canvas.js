@@ -97,13 +97,17 @@ function Canvas({ selectedAssets, categories, nftName, ethAddress, solanaAddress
 
   const uploadToIPFS = async (fileBlob, fileName) => {
     console.log(`Uploading file ${fileName} to IPFS...`);
-    
-    const file = new File([fileBlob], fileName, { type: 'image/png' });
+  
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', new File([fileBlob], fileName));
   
     try {
-      const response = await axios.post('/api/upload', formData);
+      const response = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
       if (response.status === 200) {
         const cid = response.data.cid;
         console.log(`File uploaded to IPFS, CID: ${cid}`);
@@ -116,6 +120,8 @@ function Canvas({ selectedAssets, categories, nftName, ethAddress, solanaAddress
       throw error;
     }
   };
+  
+  
   
   const generateMetadata = (imageCid, name, solanaAddress, assets) => {
     console.log('Generating metadata...');
